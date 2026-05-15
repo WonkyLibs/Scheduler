@@ -1,6 +1,7 @@
 package com.wonkglorg.utilitylib.scheduler;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -116,6 +117,16 @@ public class RegionScheduler{//NOSONAR
 		long ticks = Math.max(1, delayMillis / 50);
 		
 		plugin.getServer().getRegionScheduler().runDelayed(plugin, location, scheduledTask -> task.run(), ticks);
+	}
+	
+	/**
+	 * Runs a task on the next tick available on the local region scheduler
+	 *
+	 * @param chunk the chunk whose region scheduler should execute the task
+	 * @param task the task to run
+	 */
+	public void runAtChunk(Chunk chunk, Runnable task) {
+		plugin.getServer().getRegionScheduler().execute(plugin, chunk.getWorld(), chunk.getX(), chunk.getZ(), task);
 	}
 	
 	/**
