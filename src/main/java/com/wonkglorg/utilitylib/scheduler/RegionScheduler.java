@@ -1,6 +1,7 @@
 package com.wonkglorg.utilitylib.scheduler;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -231,6 +232,15 @@ public class RegionScheduler{//NOSONAR
 	@NotNull
 	public ScheduledTask runTaskTimer(@NotNull Runnable task, long delay, long period, TimeUnit timeUnit) {
 		return runTaskTimer(t -> task.run(), delay, period, timeUnit);
+	}
+	
+	/**
+	 * Runs a command globally
+	 *
+	 * @param command the command to run
+	 */
+	public void runCommand(String command) {
+		plugin.getServer().getGlobalRegionScheduler().execute(plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
 	}
 	
 }
