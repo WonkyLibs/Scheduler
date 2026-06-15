@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/UtilityLibScheduler.iml" filepath="$PROJECT_DIR$/UtilityLibScheduler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wonkylibs-scheduler.main.iml" filepath="$PROJECT_DIR$/.idea/modules/wonkylibs-scheduler.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wonkylibs-scheduler.test.iml" filepath="$PROJECT_DIR$/.idea/modules/wonkylibs-scheduler.test.iml" />
     </modules>
   </component>
 </project>
