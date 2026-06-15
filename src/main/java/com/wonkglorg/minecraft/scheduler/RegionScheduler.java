@@ -1,4 +1,4 @@
-package com.wonkglorg.utilitylib.scheduler;
+package com.wonkglorg.minecraft.scheduler;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
@@ -8,7 +8,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -21,50 +23,46 @@ import java.util.function.Supplier;
  */
 @SuppressWarnings("unused")
 public class RegionScheduler{//NOSONAR
-	private static RegionScheduler instance;
-	private static JavaPlugin plugin;
+	/**
+	 * All Region schedulers and their registered namespace
+	 */
+	private static final Map<String, RegionScheduler> SCHEDULER_MAP = new ConcurrentHashMap<>();
+	
+	private final JavaPlugin plugin;
 	
 	private final ScheduledExecutorService asyncExecutor;
 	
-	private RegionScheduler(String threadName) {
-		this.asyncExecutor = Executors.newScheduledThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors() / 2), r -> {
-			Thread t = new Thread(r, threadName);
+	private RegionScheduler(JavaPlugin plugin, int threadCount) {
+		this.plugin = plugin;
+		this.asyncExecutor = Executors.newScheduledThreadPool(threadCount, r -> {
+			Thread t = new Thread(r);
 			t.setDaemon(true);
 			return t;
 		});
 	}
 	
 	/**
-	 * Creates a global Async manager instance
+	 * Retrieves the existing instance or creates a new instance of the GuiManager for this plugin
 	 *
-	 * @param plugin the owning plugin
-	 * @return the created instance, the same instance can be retrieved using {@link RegionScheduler#getInstance()}
+	 * @param plugin the plugin to create the instance for
+	 * @param asyncThreadCount how many async threads to register
+	 * @return the created instance
 	 */
-	public static RegionScheduler createInstance(JavaPlugin plugin, String threadName) {
-		RegionScheduler.plugin = plugin;
-		instance = new RegionScheduler(threadName);
-		return instance;
-	}
-	
-	/**
-	 * Creates a global Async manager instance
-	 *
-	 * @param plugin the owning plugin
-	 * @return the created instance, the same instance can be retrieved using {@link RegionScheduler#getInstance()}
-	 */
-	public static RegionScheduler createInstance(JavaPlugin plugin) {
-		return createInstance(plugin, "async-thread");
-	}
-	
-	/**
-	 * @return the instance created using {@link #createInstance(JavaPlugin, String)}
-	 * @throws IllegalStateException when the instance has not been properly initialised
-	 */
-	public static RegionScheduler getInstance() {
-		if(instance == null){
-			throw new NullPointerException("AsyncManager instance not initialized!");
+	public static RegionScheduler getInstance(JavaPlugin plugin, int asyncThreadCount) {
+		if(!SCHEDULER_MAP.containsKey(plugin.namespace())){
+			SCHEDULER_MAP.put(plugin.namespace(), new RegionScheduler(plugin, asyncThreadCount));
 		}
-		return instance;
+		return SCHEDULER_MAP.get(plugin.namespace());
+	}
+	
+	/**
+	 * Retrieves the existing instance or creates a new instance of the GuiManager for this plugin
+	 *
+	 * @param plugin the plugin to create the instance for
+	 * @return the created instance
+	 */
+	public static RegionScheduler getInstance(JavaPlugin plugin) {
+		return getInstance(plugin, Math.max(2, Runtime.getRuntime().availableProcessors() / 2));
 	}
 	
 	/**

@@ -1,0 +1,7 @@
+main: com.wonkglorg.minecraft.scheduler.Main
+name: ${name}
+description: ${description}
+author: ${author}
+version: ${version}
+api-version: ${api_version}
+folia-supported: true
